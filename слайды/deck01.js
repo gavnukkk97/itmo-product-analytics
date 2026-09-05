@@ -39,6 +39,46 @@ function stat(s, x, y, w, num, label, color = PRIMARY) {
   s.addText(label, { x, y: y + 0.98, w, h: 0.65, margin: 0, fontFace: F, fontSize: 14, color: MUTED });
 }
 
+
+// Мем-компоненты (локальные копии из deck_common)
+function memeChat(s, y, header, bubbles, footnote) {
+  const px = M, pw = 8.6, ph = 0.62 + bubbles.length * 0.92;
+  s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: px, y, w: pw, h: ph, fill: { color: "0E2A1F" }, rectRadius: 0.1 });
+  s.addText(header, { x: px + 0.3, y: y + 0.14, w: pw - 0.6, h: 0.35, margin: 0, fontFace: F, fontSize: 13, bold: true, color: "8FC7A8", charSpacing: 1 });
+  let by = y + 0.62;
+  bubbles.forEach(([side, text]) => {
+    const right = side === "r";
+    const bw = 6.4;
+    const bx = right ? px + pw - bw - 0.28 : px + 0.28;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: bx, y: by, w: bw, h: 0.78, fill: { color: right ? PRIMARY : "1D4634" }, rectRadius: 0.12 });
+    s.addText(text, { x: bx + 0.24, y: by + 0.05, w: bw - 0.48, h: 0.68, margin: 0, fontFace: F, fontSize: 13.5, color: right ? "FFFFFF" : "D9EADF", valign: "middle" });
+    by += 0.92;
+  });
+  if (footnote) s.addText(footnote, { x: M, y: y + ph + 0.25, w: W - 2 * M, h: 0.9, margin: 0, fontFace: F, fontSize: 15.5, italic: true, color: MUTED });
+}
+function memeDrake(s, y, reject, approve) {
+  const ph = 1.55, gap = 0.45;
+  s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y, w: W - 2 * M, h: ph, fill: { color: "ECEEEC" }, rectRadius: 0.1 });
+  s.addShape(p.shapes.OVAL, { x: M + 0.35, y: y + ph / 2 - 0.33, w: 0.66, h: 0.66, fill: { color: "B3543F" } });
+  s.addText("✕", { x: M + 0.35, y: y + ph / 2 - 0.33, w: 0.66, h: 0.66, align: "center", valign: "middle", margin: 0, fontFace: F, fontSize: 24, bold: true, color: "FFFFFF" });
+  s.addText(reject, { x: M + 1.35, y: y + 0.15, w: W - 2 * M - 1.7, h: ph - 0.3, margin: 0, fontFace: F, fontSize: 18, color: "4A4A4A", valign: "middle" });
+  const y2 = y + ph + gap;
+  s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y: y2, w: W - 2 * M, h: ph, fill: { color: TINT }, rectRadius: 0.1 });
+  s.addShape(p.shapes.OVAL, { x: M + 0.35, y: y2 + ph / 2 - 0.33, w: 0.66, h: 0.66, fill: { color: PRIMARY } });
+  s.addText("✓", { x: M + 0.35, y: y2 + ph / 2 - 0.33, w: 0.66, h: 0.66, align: "center", valign: "middle", margin: 0, fontFace: F, fontSize: 22, bold: true, color: "FFFFFF" });
+  s.addText(approve, { x: M + 1.35, y: y2 + 0.15, w: W - 2 * M - 1.7, h: ph - 0.3, margin: 0, fontFace: F, fontSize: 18, bold: true, color: PRIMARY, valign: "middle" });
+}
+function memeSplit(s, y, leftHead, leftText, rightHead, rightText) {
+  const cw = 5.6, ch = 2.9;
+  s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y, w: cw, h: ch, fill: { color: "ECEEEC" }, rectRadius: 0.1 });
+  s.addText(leftHead, { x: M + 0.35, y: y + 0.3, w: cw - 0.7, h: 0.55, margin: 0, fontFace: F, fontSize: 24, bold: true, color: "6A6A6A", charSpacing: 2 });
+  s.addText(leftText, { x: M + 0.35, y: y + 1.0, w: cw - 0.7, h: ch - 1.3, margin: 0, fontFace: F, fontSize: 16.5, color: "4A4A4A" });
+  const x2 = M + cw + 0.6;
+  s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: x2, y, w: cw, h: ch, fill: { color: TINT }, rectRadius: 0.1 });
+  s.addText(rightHead, { x: x2 + 0.35, y: y + 0.3, w: cw - 0.7, h: 0.55, margin: 0, fontFace: F, fontSize: 24, bold: true, color: ACCENT, charSpacing: 2 });
+  s.addText(rightText, { x: x2 + 0.35, y: y + 1.0, w: cw - 0.7, h: ch - 1.3, margin: 0, fontFace: F, fontSize: 16.5, bold: true, color: TEXT });
+}
+
 /* ---------- 1. Титул ---------- */
 let s = base(true);
 s.addText("AI TALENT HUB · ИТМО · БЛОК «ПРОДУКТОВОЕ МЫШЛЕНИЕ»", { x: M, y: 0.9, w: 10, h: 0.35,
@@ -174,6 +214,17 @@ funcs.forEach(([t, q, m], i) => {
 s.addText("В ATH-проектах вы почти всегда embedded: аналитик — это вы. Курс — про умение быть «переводчиком» между бизнес-вопросом и моделью.", { x: M, y: 6.65, w: 11.4, h: 0.65, margin: 0, fontFace: F, fontSize: 15, italic: true, color: MUTED });
 pageNum(s, 7);
 
+/* ---------- 8. Чатик заявок ---------- */
+s = base(); chip(s, "НЕДЕЛЯ 1 · ЛЕКЦИЯ");
+header(s, "Как это выглядит в реальности", "Входящие заявки, понедельник 09:47");
+memeChat(s, 2.0, "«Лукошко» · продуктовый чат", [
+  ["l", "Отток растёт. Внедрим ML-модель удержания? Бюджет 20 млн/год"],
+  ["l", "LLM сократит 30% операторов поддержки — я видел демо"],
+  ["l", "AUC 0.79! Показываем баннер всем, у кого высокая вероятность покупки"],
+  ["r", "…а что должно измениться в деньгах?"],
+], "Занятие недели 1: переписываем каждую в гипотезу — вопрос → метрика → guardrail → нужен ли ML вообще.");
+pageNum(s, 8);
+
 /* ---------- 8. Эстафета ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ЛЕКЦИЯ");
 header(s, "Где теряется смысл", "Эстафета со сломанным переводом");
@@ -192,7 +243,7 @@ relay.forEach(([t, d], i) => {
 });
 s.addText("Кто-то должен был спросить: что мы будем делать с предсказанием — и как оно вернёт деньги?", { x: M, y: 4.65, w: 11.4, h: 0.6, margin: 0, fontFace: F, fontSize: 21, bold: true, color: PRIMARY });
 s.addText("Эта роль — аналитик в широком смысле. Не «человек-функция качества модели»: сформулировал задачу, построил, измерил эффект, ответил бизнесу.", { x: M, y: 5.5, w: 11.4, h: 0.9, margin: 0, fontFace: F, fontSize: 17, color: TEXT });
-pageNum(s, 8);
+pageNum(s, 9);
 
 /* ---------- 9. Пять жанров задач ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ЛЕКЦИЯ");
@@ -213,7 +264,7 @@ s.addTable(genres.map((r, ri) => r.map(c => ({
 }))), { x: M, y: 2.05, w: W - 2*M, colW: [2.8, 2.7, 3.1, 3.5], rowH: 0.66,
   border: { pt: 1, color: LINE }, fontFace: F, valign: "middle", margin: 0.08 });
 s.addText("Аналитика — это спектр, а не «дашборды» и не «ML». Спор о жанре — частая причина конфликтов: ad-hoc ждут за час, проект — за месяц.", { x: M, y: 6.5, w: 11.4, h: 0.6, margin: 0, fontFace: F, fontSize: 14, color: MUTED });
-pageNum(s, 9);
+pageNum(s, 10);
 
 /* ---------- 10. Kaggle vs бизнес ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ЛЕКЦИЯ");
@@ -235,8 +286,17 @@ diffs.forEach(([t, a, b], i) => {
   if (i < 3) s.addShape(p.shapes.LINE, { x: M, y: y + 0.92, w: W - 2*M, h: 0, line: { color: LINE, width: 1 } });
 });
 s.addText("Вопрос залу: какой пункт чаще всего игнорируют ML-инженеры?", { x: M, y: 6.75, w: 11.4, h: 0.5, margin: 0, fontFace: F, fontSize: 15, italic: true, color: MUTED });
-pageNum(s, 10);
+pageNum(s, 11);
 s.addNotes("Ответ: первый — метрику берут по умолчанию, потом «AUC вырос, а бизнес нет».");
+
+/* ---------- 11½. Дрейк ---------- */
+s = base(); chip(s, "НЕДЕЛЯ 1 · ЛЕКЦИЯ");
+header(s, "Рефлекс, который лечим весь курс", "«Сначала модель» — не работает");
+memeDrake(s, 2.4,
+  "Обучить модель, потому что «это в задании»",
+  "Сначала спросить: что изменит решение — и кто это заметит в деньгах");
+s.addText("Если узнали себя — хорошо: курс ровно про это.", { x: M, y: 6.55, w: 11.4, h: 0.5, margin: 0, fontFace: F, fontSize: 15, italic: true, color: MUTED });
+pageNum(s, 12);
 
 /* ---------- 11. Фреймворк курса ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ЛЕКЦИЯ");
@@ -257,7 +317,7 @@ steps.forEach(([t, d], i) => {
   if (i < 4) s.addShape(p.shapes.LINE, { x: M + 0.31, y: y + 0.64, w: 0, h: 0.26, line: { color: PRIMARY, width: 1.5 } });
 });
 s.addText("Над всем — ML-рычаг: в какой точке модель реально нужна, а в какой это карго-культ.", { x: M, y: 6.85, w: 11.4, h: 0.5, margin: 0, fontFace: F, fontSize: 16, bold: true, color: ACCENT });
-pageNum(s, 11);
+pageNum(s, 13);
 
 /* ---------- 12. Кейс RecSys: было/стало ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ML-ПРИМЕР");
@@ -281,7 +341,7 @@ s.addTable(kpi.map((r, ri) => r.map((c, ci) => ({
 s.addText("Что случилось", { x: 9.1, y: 2.0, w: 3.4, h: 0.4, margin: 0, fontFace: F, fontSize: 15, bold: true, color: ACCENT, charSpacing: 1 });
 s.addText("Модель оптимизировала клик — и выучила кликбейт: яркие, дешёвые, «как у соседа» товары низкого качества. Клик есть, покупка по инерции, возврат — двойная логистика ≈ 250 ₽ убытка и раздражение.", { x: 9.1, y: 2.45, w: 3.5, h: 3.2, margin: 0, fontFace: F, fontSize: 14, color: TEXT });
 s.addText("Целевая функция отвечала на вопрос «на что нажмут», а не «что купят и вернут».", { x: 9.1, y: 5.6, w: 3.5, h: 1.0, margin: 0, fontFace: F, fontSize: 14, italic: true, color: MUTED });
-pageNum(s, 12);
+pageNum(s, 14);
 
 /* ---------- 13. Разбор по фреймворку ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ML-ПРИМЕР");
@@ -303,7 +363,7 @@ s.addText([
   { text: "Кому должно было быть больно: ", options: { bold: true, color: TEXT } },
   { text: "категорийному менеджеру (возвраты = штрафы), логистике (обратный поток), CFO (маржа). Никто из них не был в ревью модели.", options: { color: MUTED } },
 ], { x: M, y: 6.35, w: 11.4, h: 0.85, margin: 0, fontFace: F, fontSize: 15 });
-pageNum(s, 13);
+pageNum(s, 15);
 
 /* ---------- 14. LLM-фича ---------- */
 s = base(); chip(s, "НЕДЕЛЯ 1 · ML-ПРИМЕР");
@@ -313,7 +373,16 @@ stat(s, 4.4, 2.3, 3.4, "0,4%", "adoption через месяц: 2 человек
 s.addText("Диагноз: фича решала задачу, которой у пользователя нет — отзывы перед покупкой FMCG читают 7%, и «лайк» разметчика ≠ боль покупателя.", { x: M, y: 4.5, w: 11.4, h: 0.85, margin: 0, fontFace: F, fontSize: 18, color: TEXT });
 s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y: 5.5, w: 11.4, h: 1.15, fill: { color: TINT }, rectRadius: 0.08 });
 s.addText("Качество модели ≠ ценность фичи. Ценность = (сколько людей в какой боли) × (насколько решает). Считаем до разработки, а не после.", { x: M + 0.35, y: 5.7, w: 10.7, h: 0.8, margin: 0, fontFace: F, fontSize: 18, bold: true, color: PRIMARY });
-pageNum(s, 14);
+pageNum(s, 16);
+
+/* ---------- 15. Ожидание/реальность ---------- */
+s = base(); chip(s, "НЕДЕЛЯ 1 · ML-ПРИМЕР");
+header(s, "Запуск ML-фичи", "Ожидание и реальность");
+memeSplit(s, 2.5,
+  "ОЖИДАНИЕ", "Evals 4,6/5 — катим на всю базу, все в восторге",
+  "РЕАЛЬНОСТЬ", "Adoption 0,4%: разворачивают двое из 500 в день");
+s.addText("Ценность фичи = (сколько людей в какой боли) × (насколько она решает). Считаем до разработки, а не после.", { x: M, y: 6.15, w: 11.4, h: 0.7, margin: 0, fontFace: F, fontSize: 15, italic: true, color: MUTED });
+pageNum(s, 17);
 
 /* ---------- 15. Домашка (dark closing) ---------- */
 s = base(true);
@@ -331,6 +400,6 @@ s.addText([
   { text: "Цель недели — сломать рефлекс «сначала модель».", options: { italic: true, color: ACCENT } },
 ], { x: 7.4, y: 3.15, w: 5.3, h: 2.6, margin: 0, fontFace: F, fontSize: 17, paraSpaceAfter: 10 });
 s.addText("Следующая неделя: система метрик — NSM, дерево, guardrails. Практика: retention и когорты на данных «Лукошко».", { x: M, y: 6.6, w: 11.4, h: 0.6, margin: 0, fontFace: F, fontSize: 15, color: "7FA08D" });
-pageNum(s, 15, true);
+pageNum(s, 18, true);
 
 p.writeFile({ fileName: "../неделя-01/лекция-01.pptx" }).then(() => console.log("done"));

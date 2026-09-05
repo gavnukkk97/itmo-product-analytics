@@ -103,6 +103,49 @@ module.exports = function makeStyle(p, weekTag) {
     s.addText(footer, { x: M, y: 6.95, w: 10, h: 0.35, margin: 0, fontFace: F, fontSize: 13, color: "7FA08D" });
     return s;
   }
+
+  // Мем-формат «чатик»: тёмная панель мессенджера, bubbles = ["l"|"r", текст]
+  function memeChat(s, y, header, bubbles, footnote) {
+    const px = M, pw = 8.6, ph = 0.62 + bubbles.length * 0.92;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: px, y, w: pw, h: ph, fill: { color: "0E2A1F" }, rectRadius: 0.1 });
+    s.addText(header, { x: px + 0.3, y: y + 0.14, w: pw - 0.6, h: 0.35, margin: 0, fontFace: F, fontSize: 13, bold: true, color: "8FC7A8", charSpacing: 1 });
+    let by = y + 0.62;
+    bubbles.forEach(([side, text]) => {
+      const right = side === "r";
+      const bw = 6.4;
+      const bx = right ? px + pw - bw - 0.28 : px + 0.28;
+      s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: bx, y: by, w: bw, h: 0.78, fill: { color: right ? PRIMARY : "1D4634" }, rectRadius: 0.12 });
+      s.addText(text, { x: bx + 0.24, y: by + 0.05, w: bw - 0.48, h: 0.68, margin: 0, fontFace: F, fontSize: 13.5, color: right ? "FFFFFF" : "D9EADF", valign: "middle" });
+      by += 0.92;
+    });
+    if (footnote) s.addText(footnote, { x: M, y: y + ph + 0.25, w: W - 2 * M, h: 0.9, margin: 0, fontFace: F, fontSize: 15.5, italic: true, color: MUTED });
+  }
+  // Мем-формат «дрейк»: панель ✕ (отклоняем) и панель ✓ (принимаем)
+  function memeDrake(s, y, reject, approve) {
+    const ph = 1.55, gap = 0.45;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y, w: W - 2 * M, h: ph, fill: { color: "ECEEEC" }, rectRadius: 0.1 });
+    s.addShape(p.shapes.OVAL, { x: M + 0.35, y: y + ph / 2 - 0.33, w: 0.66, h: 0.66, fill: { color: "B3543F" } });
+    s.addText("✕", { x: M + 0.35, y: y + ph / 2 - 0.33, w: 0.66, h: 0.66, align: "center", valign: "middle", margin: 0, fontFace: F, fontSize: 24, bold: true, color: "FFFFFF" });
+    s.addText(reject, { x: M + 1.35, y: y + 0.15, w: W - 2 * M - 1.7, h: ph - 0.3, margin: 0, fontFace: F, fontSize: 18, color: "4A4A4A", valign: "middle" });
+    const y2 = y + ph + gap;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y: y2, w: W - 2 * M, h: ph, fill: { color: TINT }, rectRadius: 0.1 });
+    s.addShape(p.shapes.OVAL, { x: M + 0.35, y: y2 + ph / 2 - 0.33, w: 0.66, h: 0.66, fill: { color: PRIMARY } });
+    s.addText("✓", { x: M + 0.35, y: y2 + ph / 2 - 0.33, w: 0.66, h: 0.66, align: "center", valign: "middle", margin: 0, fontFace: F, fontSize: 22, bold: true, color: "FFFFFF" });
+    s.addText(approve, { x: M + 1.35, y: y2 + 0.15, w: W - 2 * M - 1.7, h: ph - 0.3, margin: 0, fontFace: F, fontSize: 18, bold: true, color: PRIMARY, valign: "middle" });
+  }
+  // Мем-формат «ожидание / реальность»: две карточки
+  function memeSplit(s, y, leftHead, leftText, rightHead, rightText) {
+    const cw = 5.6, ch = 2.9;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: M, y, w: cw, h: ch, fill: { color: "ECEEEC" }, rectRadius: 0.1 });
+    s.addText(leftHead, { x: M + 0.35, y: y + 0.3, w: cw - 0.7, h: 0.55, margin: 0, fontFace: F, fontSize: 24, bold: true, color: "6A6A6A", charSpacing: 2 });
+    s.addText(leftText, { x: M + 0.35, y: y + 1.0, w: cw - 0.7, h: ch - 1.3, margin: 0, fontFace: F, fontSize: 16.5, color: "4A4A4A" });
+    const x2 = M + cw + 0.6;
+    s.addShape(p.shapes.ROUNDED_RECTANGLE, { x: x2, y, w: cw, h: ch, fill: { color: TINT }, rectRadius: 0.1 });
+    s.addText(rightHead, { x: x2 + 0.35, y: y + 0.3, w: cw - 0.7, h: 0.55, margin: 0, fontFace: F, fontSize: 24, bold: true, color: ACCENT, charSpacing: 2 });
+    s.addText(rightText, { x: x2 + 0.35, y: y + 1.0, w: cw - 0.7, h: ch - 1.3, margin: 0, fontFace: F, fontSize: 16.5, bold: true, color: TEXT });
+  }
+
   return { BG, DARK, PRIMARY, ACCENT, TEXT, MUTED, TINT, LINE, F, W, H, M, bu,
-    base, chip, pageNum, header, stat, table, rowsList, stepsChain, flowRow, question, titleSlide };
+    base, chip, pageNum, header, stat, table, rowsList, stepsChain, flowRow, question, titleSlide,
+    memeChat, memeDrake, memeSplit };
 };

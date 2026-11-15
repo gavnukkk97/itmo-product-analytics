@@ -1,4 +1,4 @@
 .DS_Store
-слайды/render/
-ноутбуки/**/.ipynb_checkpoints/
+**/.ipynb_checkpoints/
 **/__pycache__/
+архив/слайды/render/
